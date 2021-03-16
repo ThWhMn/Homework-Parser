@@ -28,8 +28,14 @@ int cnt = 0;
 letter [A-Za-z_]
 
 %%
- /*{letter}+ {printf("length of input:%d", yyleng);} */
-"float"(" "+)(letter+)";" {
+^" "*{letter}+" "+{letter}+" "*";"" "*$ {
+    sscanf(yytext, "%*[ ]%[a-z]%*[ ]%[A-Za-z]", tokens[0].keyword, tokens[0].id);
+	printf("keyword: %s\nid: %s", tokens[0].keyword, tokens[0].id);
+}
+[0-9]+ {
+    printf("integer: %d", atoi(yytext));
+}
+ /*{letter}+ {printf("length of input:%d", yyleng);}
     printf("input: %s", yytext);
     scanf("%s", tokens[cnt].keyword);
     while (getchar()==' ') ;
@@ -37,7 +43,7 @@ letter [A-Za-z_]
     cnt++;
     printf("keywords: %s\nid: %s\n", tokens[0].keyword, tokens[0].id);
 }
-[0-9]+ {printf("%d", atoi(yytext));}
+*/
 %%
 
 int main()
