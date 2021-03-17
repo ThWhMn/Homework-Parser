@@ -1,0 +1,6 @@
+float a;
+a = a - b-23;
+all right
+rules:
+    no ';' '.'
+    one statement in each line

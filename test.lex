@@ -5,51 +5,44 @@
 
 #define LENS 10
 #define MAX_NUM 20
-const char *keywords[] = {
-    "int",
-    "float",
-    NULL,
-};
-const char ops[][LENS] = {
-    "+", "-", "*", "/",
-};
-struct threeAddressCode{
-    char keyword[LENS];
+struct data{
+	char keyword[LENS];
     char id[LENS];
     char op[LENS];
+	char exp[LENS];
     union {
-        int iValue;
-	float fValue;
+		int iValue;
+	    float fValue;
     }value;
-}tokens[MAX_NUM];
-int cnt = 0;
+} test; 
+int cnt=0;
 %}
 
-letter [A-Za-z_]
+keyword [A-Za-z]
+id 	   [A-za-z_]
+digit  [0-9.]
+operation [+\-*/]
+expression {id}|{digit}|{operation}
+operand {id}|{digit}
 
 %%
-^" "*{letter}+" "+{letter}+" "*";"" "*$ {
-    sscanf(yytext, "%*[ ]%[a-z]%*[ ]%[A-Za-z]", tokens[0].keyword, tokens[0].id);
-	printf("keyword: %s\nid: %s", tokens[0].keyword, tokens[0].id);
+^{keyword}+" "+{id}+" "*";"" "*$ {
+    sscanf(yytext, "%[a-z]%*[ ]%[A-Za-z]", test.keyword, test.id);
+	printf("keyword: %s\nid: %s\n", test.keyword, test.id);
 }
-[0-9]+ {
-    printf("integer: %d", atoi(yytext));
+^{id}+" "*"="" "*{operand}+(" "*{operation}" "*{operand}+)*" "*";"" "*$ {
+    sscanf(yytext, "%[A-Za-z_]%*[ =]%[A-Za-z0-9.+/*-]", test.id, test.exp);
+	printf("id: %s\nexpression: %s\n", test.id, test.exp);
 }
- /*{letter}+ {printf("length of input:%d", yyleng);}
-    printf("input: %s", yytext);
-    scanf("%s", tokens[cnt].keyword);
-    while (getchar()==' ') ;
-    scanf("%s", tokens[cnt].id);
-    cnt++;
-    printf("keywords: %s\nid: %s\n", tokens[0].keyword, tokens[0].id);
+\n {;}
+^.*$ {
+    printf("Unrecognized grammer.\n");
 }
-*/
 %%
 
 int main()
 {
     printf("Analysis start\n");
     yylex();
-    printf("Analysis finished\n");
     return 0;
 }
