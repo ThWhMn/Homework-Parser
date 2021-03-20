@@ -1,38 +1,48 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define LENS 10
-#define MAX_NUM 20
-struct data{
-	char keyword[LENS];
-    char id[LENS];
-    char op[LENS];
-	char exp[LENS];
-    union {
-		int iValue;
-	    float fValue;
-    }value;
-} test; 
-int cnt=0;
+#include "head.h"
 %}
 
-keyword [A-Za-z]
-id 	   [A-za-z_]
+keyword [a-z]
+id 	    [A-Za-z]
 digit  [0-9.]
-operation [+\-*/]
-expression {id}|{digit}|{operation}
+operation [+\-*/()]
+expression {id}|{digit}|{operation}|" "
 operand {id}|{digit}
 
 %%
-^{keyword}+" "+{id}+" "*";"" "*$ {
-    sscanf(yytext, "%[a-z]%*[ ]%[A-Za-z]", test.keyword, test.id);
-	printf("keyword: %s\nid: %s\n", test.keyword, test.id);
+^{keyword}+" "+{id}+" "*$ {
+    sscanf(yytext, "%[a-z]%*[ ]%[A-Za-z]", var[cnt].keyword, &var[cnt].id);
+    // printf("keyword: %s\nid: %c\n", var[cnt].keyword, var[cnt].id);
+    if (isKeyword(var[cnt].keyword)) {
+        init(&var[cnt]);
+        cnt++;
+        // printf("cnt: %d\n", cnt);
+    } else {
+        printf("Value type error! Check and input again.\n");
+    }
 }
-^{id}+" "*"="" "*{operand}+(" "*{operation}" "*{operand}+)*" "*";"" "*$ {
-    sscanf(yytext, "%[A-Za-z_]%*[ =]%[A-Za-z0-9.+/*-]", test.id, test.exp);
-	printf("id: %s\nexpression: %s\n", test.id, test.exp);
+^{id}+" "*"="" "*{expression}+" "*$ {
+    int index;
+    sscanf(yytext, "%[A-Za-z]%*[ =]%[A-Za-z0-9.() +/*-]", &line.id, line.exp);
+    // printf("id: %c\nexp: %s\n", line.id, line.exp);
+    if ((index = existId(line.id)) != -1) {
+        if (check(line.exp, &line.expHasId, index)) {
+            compute(&line);
+        } else {
+            printf("Unrecognized expression!\n");
+        }
+    } else {
+        printf("Variable not declared!\n");
+    }
+}
+^"write("" "*{id}" "*")"" "*$ {
+    sscanf(yytext, "%*[write]%*[( ]%[A-Za-z]", &line.id);
+    int i;
+    if ((i = existId(line.id)) != -1) {
+        writeValue(i);
+    } else {
+        printf("Variable not exist!\n");
+    }
 }
 \n {;}
 ^.*$ {

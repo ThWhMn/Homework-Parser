@@ -31,7 +31,7 @@ operand {id}|{digit}
 	printf("keyword: %s\nid: %s\n", test.keyword, test.id);
 }
 ^{id}+" "*"="" "*{operand}+(" "*{operation}" "*{operand}+)*" "*";"" "*$ {
-    sscanf(yytext, "%[A-Za-z_]%*[ =]%[A-Za-z0-9.+/*-]", test.id, test.exp);
+    sscanf(yytext, "%[A-Za-z_]%*[ =]%[A-Za-z0-9. +/*-]", test.id, test.exp);
 	printf("id: %s\nexpression: %s\n", test.id, test.exp);
 }
 \n {;}

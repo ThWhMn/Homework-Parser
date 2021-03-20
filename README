@@ -4,3 +4,5 @@ all right
 rules:
     no ';' '.'
     one statement in each line
+1 + ((3-2) * 4 + 3) * 5 - 8/2
+1 + 3-2 * 4 + 3*5 - 8/2
